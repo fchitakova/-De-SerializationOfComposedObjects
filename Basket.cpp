@@ -22,7 +22,7 @@ void Basket::setEggs(const Egg*eggs)
 Basket::Basket(const Basket&rhs) :ownerName(NULL), eggs(NULL), size(0) 
 {
 	setNewValue(ownerName, rhs.ownerName,strlen(rhs.ownerName)+1);
-	setNewValue(eggs, rhs.eggs, sizeof(rhs.eggs));
+	setNewValue(eggs, rhs.eggs, sizeof(rhs.eggs)*(size/2));
 	size = rhs.size;
 }
 
@@ -32,7 +32,7 @@ Basket&Basket::operator=(const Basket&rhs)
 	if (this != &rhs)
 	{
 		setNewValue(ownerName, rhs.ownerName, strlen(rhs.ownerName) + 1);
-		setNewValue(eggs, rhs.eggs, sizeof(rhs.eggs));
+		setNewValue(eggs, rhs.eggs, sizeof(rhs.eggs)*(size/2));
 		size = rhs.size;
 	}
 	return *this;
@@ -46,11 +46,9 @@ void Basket::addEgg(const char*str)
 	setNewValue(buffer, eggs, size);
 	size += 2;  
 	delete[]eggs;
-	eggs = new Egg[size];
-	setNewValue(eggs, buffer, size - 2);
-	delete[]buffer;
+	eggs=buffer;
 	Egg*helper = new Egg(str, 1);
-	eggs[size - 1] = *helper;
+	eggs[(size/2)+1] = *helper;
 	delete[]helper;
 }
 
@@ -76,7 +74,7 @@ void Basket::Serialize(const char*filename)const
 {
 	size_t namelen = strlen(ownerName);
 	std::ofstream of(filename,std::ios::binary | std::ios::out);
-	of.write((char*)&ownerName, sizeof(size_t));
+	of.write((char*)&namelen, sizeof(size_t));
 	of.write(ownerName, namelen + 1);
 	of.write((char*)&size, sizeof(size_t));
 	for (size_t i = 0; i < size / 2; ++i)
